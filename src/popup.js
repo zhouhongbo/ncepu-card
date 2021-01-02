@@ -50,6 +50,10 @@ document.querySelector("button").onclick = function () {
 }
 
 chrome.runtime.onMessage.addListener((message) => {
-    document.querySelector("#progress").innerHTML = document.querySelector("#progress").innerHTML + message + "<br>";
-    console.log(message);
+    if (message === "未登陆！") {
+        document.querySelector("#warn").innerHTML = message;
+    } else {
+        document.querySelector("#progress").innerHTML = document.querySelector("#progress").innerHTML + message + "<br>";
+        console.log(message);
+    }
 })

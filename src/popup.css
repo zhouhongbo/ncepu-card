@@ -1,5 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    width: 250px;
+    width: 431px;
+}
+
+#left {
+    float: left;
+    width: 200px;
+    margin: 10px;
+    margin-right: 0;
+}
+
+#right {
+    float: left;
+    width: 200px;
+    margin: 10px;
+    margin-left: 0;
+    padding-left: 10px;
+    border-left: 1px solid #ddd;
+}
+
+#right p {
+    padding-bottom: 5px;
 }
 
 #warn {

@@ -77,6 +77,7 @@ function oneMonth(year, month, records) {
         console.log(`${year}年${month}月无消费记录`);
     } else if (recordNum === "-1") {
         console.log("未登陆！");
+        chrome.runtime.sendMessage("未登陆！");
     } else {
         for (let i = 1; i <= parseInt(pageNum); i++) {
             let response = getResponse(startTime, endTime, i);
@@ -94,5 +95,5 @@ function recordsToExcel(records, startDate, endDate) {
     ws['!cols'] = [{ wch: 20 }, { wch: 8 }, { wch: 20 }, { wch: 8 }, { wch: 8 }] // 设置列宽
     XLSX.utils.book_append_sheet(wb, ws, ws_name);  // 将数据添加到工作薄
     XLSX.writeFile(wb, filename); // 导出Excel
-    console.log("导出成功！")
+    console.log("导出成功！");
 }
