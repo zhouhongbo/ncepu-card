@@ -48,3 +48,8 @@ document.querySelector("button").onclick = function () {
         chrome.runtime.sendMessage(message);
     }
 }
+
+chrome.runtime.onMessage.addListener((message) => {
+    document.querySelector("#progress").innerHTML = document.querySelector("#progress").innerHTML + message + "<br>";
+    console.log(message);
+})

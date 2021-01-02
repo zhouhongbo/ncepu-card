@@ -1,6 +1,5 @@
 chrome.runtime.onMessage.addListener((message) => {
     console.log(message);
-    debugger
     // 用户输入的参数
     let startDate = new Date(message.startYear, message.startMonth-1);
     let endDate = new Date(message.endYear, message.endMonth-1);
@@ -12,16 +11,20 @@ chrome.runtime.onMessage.addListener((message) => {
             recordsToExcel(records, startDate, endDate);
             return;
         } else {
+            console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`);
             oneMonth(endDate.getFullYear(), endDate.getMonth() + 1, records);
             endDate.setMonth(endDate.getMonth() - 1);
-            setTimeout(loop, 0, startDate, endDate, records);
-            // document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`;
-            console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`)
+            setTimeout(loop, 1000, startDate, endDate, records);
+            if (endDate - startDate < 0) {
+                chrome.runtime.sendMessage("读取完毕！");
+            } else {
+                chrome.runtime.sendMessage("该月数据读取完毕！");
+                chrome.runtime.sendMessage(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`);
+            }
         }
     }
-    setTimeout(loop, 0, startDate, endDate, records);
-    // document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`;
-    console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`);
+    setTimeout(loop, 1000, startDate, endDate, records);
+    chrome.runtime.sendMessage(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`);
 });
 
 function getResponse(startTime, endTime, pageId) {
