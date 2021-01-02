@@ -75,9 +75,6 @@ function oneMonth(year, month, records) {
     let recordNum = response.match(/共(.+)条/)[1];
     if (recordNum === "0") {
         console.log(`${year}年${month}月无消费记录`);
-    } else if (recordNum === "-1") {
-        console.log("未登陆！");
-        chrome.runtime.sendMessage("未登陆！");
     } else {
         for (let i = 1; i <= parseInt(pageNum); i++) {
             let response = getResponse(startTime, endTime, i);

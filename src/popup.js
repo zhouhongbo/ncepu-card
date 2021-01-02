@@ -36,8 +36,11 @@ document.querySelector("button").onclick = function () {
     // 检查时间是否合法
     let startDate = new Date(startYear, startMonth - 1);
     let endDate = new Date(endYear, endMonth - 1);
+    debugger
     if (endDate - startDate < 0 || date - startDate < 0 || date - endDate < 0) {
-        document.querySelector("#warn").innerHTML = "时间输入错误，请重新选择";
+        document.querySelector("#warn").innerHTML = "时间输入错误，请重新选择！";
+    } else if (!isLogin()) {
+        document.querySelector("#warn").innerHTML = "未登陆！";
     } else {
         let message = {
             startYear: startYear,
@@ -57,3 +60,18 @@ chrome.runtime.onMessage.addListener((message) => {
         console.log(message);
     }
 })
+
+function isLogin() {
+    let url = "http://ecard.ncepu.edu.cn/cardUserManager.do?method=searchTrjnInfo&page=1&startTime=2020-01-01&endTime=2020-01-01&findType=1210&goPage=";
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", url, false);
+    xhr.send();
+    if (xhr.status === 200) {
+        debugger
+        if (xhr.response.match(/共(.+)条/)[1] === "-1") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
