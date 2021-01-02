@@ -46,15 +46,15 @@ document.querySelector("button").onclick = function () {
                 recordsToExcel(records, startDate, endDate);
                 return;
             } else {
-                document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据...`;
                 console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据...`);
                 oneMonth(endDate.getFullYear(), endDate.getMonth() + 1, records);
                 endDate.setMonth(endDate.getMonth() - 1);
                 setTimeout(loop, 0, startDate, endDate, records);
+                document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`;
             }
         }
         setTimeout(loop, 0, startDate, endDate, records);
-        document.querySelector("#progress").innerText = "正在读取数据...";
+        document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`;
     }
 }
 
@@ -112,13 +112,12 @@ function oneMonth(year, month, records) {
             let response = getResponse(startTime, endTime, i);
             responseToRecord(response, records);
             console.log(i + "/" + pageNum);
-            document.querySelector("#page").innerText = i + "/" + pageNum;
         }
     }
 }
 
 function recordsToExcel(records, startDate, endDate) {
-    let filename = `${startDate.getFullYear()}年${startDate.getMonth()+1}月至${endDate.getFullYear()}年${endDate.getMonth()+1}月校园卡消费记录.xlsx`;
+    let filename = `${startDate.getFullYear()}年${startDate.getMonth() + 1}月至${endDate.getFullYear()}年${endDate.getMonth() + 1}月校园卡消费记录.xlsx`;
     let data = records;  // 数据，一定注意需要是二维数组
     let ws_name = "Sheet1"; // Excel第一个sheet的名称
     let wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(data);
