@@ -27,7 +27,6 @@ endMonthSelector.options[date.getMonth()].selected = 1;
 
 // 按钮点击事件
 document.querySelector("button").onclick = function () {
-    // document.body.style.background = "red";
     document.querySelector("#warn").innerHTML = " ";
     let startYear = +startYearSelector[startYearSelector.selectedIndex].text;
     let endYear = +endYearSelector[endYearSelector.selectedIndex].text;
@@ -42,28 +41,20 @@ document.querySelector("button").onclick = function () {
     } else {
         // 逆向遍历月份，把所有数据保存到records
         let records = [["消费地点", "设备ID", "消费时间", "消费金额", "卡内余额"]];
-        for (let year = endYear; year >= startYear; year--) {
-            let end = 12;
-            let start = 1;
-            if (year === startYear) start = startMonth;
-            if (year === endYear) end = endMonth;
-            for (let month = end; month >= start; month--) {
-                document.querySelector("#progress").innerText = `读取${year}年${month}月的数据...`;
-                console.log(`读取${year}年${month}月的数据...`);
-                oneMonth(year, month, records);
+        function loop(startDate, endDate, records) {
+            if (endDate - startDate < 0) {
+                recordsToExcel(records, startDate, endDate);
+                return;
+            } else {
+                document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据...`;
+                console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据...`);
+                oneMonth(endDate.getFullYear(), endDate.getMonth() + 1, records);
+                endDate.setMonth(endDate.getMonth() - 1);
+                setTimeout((startDate, endDate, records) => loop(startDate, endDate, records), 0, startDate, endDate, records);
             }
         }
-
-        // 导出数据到Excel
-        var filename = startYear + "年" + startMonth + "月至" + endYear + "年" + endMonth + "月校园卡消费记录.xlsx"; // 文件名称
-        var data = records;  // 数据，一定注意需要是二维数组
-        var ws_name = "Sheet1"; // Excel第一个sheet的名称
-        var wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(data);
-        ws['!cols'] = [{ wch: 20 }, { wch: 8 }, { wch: 20 }, { wch: 8 }, { wch: 8 }] // 设置列宽
-        XLSX.utils.book_append_sheet(wb, ws, ws_name);  // 将数据添加到工作薄
-        XLSX.writeFile(wb, filename); // 导出Excel
-        console.log("导出成功！")
-        document.querySelector("#progress").innerText = "导出成功！";
+        setTimeout((startDate, endDate, records) => loop(startDate, endDate, records), 0, startDate, endDate, records);
+        document.querySelector("#progress").innerText = "正在读取数据...";
     }
 }
 
@@ -124,4 +115,16 @@ function oneMonth(year, month, records) {
             document.querySelector("#page").innerText = i + "/" + pageNum;
         }
     }
+}
+
+function recordsToExcel(records, startDate, endDate) {
+    let filename = `${startDate.getFullYear()}年${startDate.getMonth()+1}月至${endDate.getFullYear()}年${endDate.getMonth()+1}月校园卡消费记录.xlsx`;
+    let data = records;  // 数据，一定注意需要是二维数组
+    let ws_name = "Sheet1"; // Excel第一个sheet的名称
+    let wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = [{ wch: 20 }, { wch: 8 }, { wch: 20 }, { wch: 8 }, { wch: 8 }] // 设置列宽
+    XLSX.utils.book_append_sheet(wb, ws, ws_name);  // 将数据添加到工作薄
+    XLSX.writeFile(wb, filename); // 导出Excel
+    console.log("导出成功！")
+    document.querySelector("#progress").innerText = "导出成功！";
 }
