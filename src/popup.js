@@ -50,10 +50,10 @@ document.querySelector("button").onclick = function () {
                 console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据...`);
                 oneMonth(endDate.getFullYear(), endDate.getMonth() + 1, records);
                 endDate.setMonth(endDate.getMonth() - 1);
-                setTimeout((startDate, endDate, records) => loop(startDate, endDate, records), 0, startDate, endDate, records);
+                setTimeout(loop, 0, startDate, endDate, records);
             }
         }
-        setTimeout((startDate, endDate, records) => loop(startDate, endDate, records), 0, startDate, endDate, records);
+        setTimeout(loop, 0, startDate, endDate, records);
         document.querySelector("#progress").innerText = "正在读取数据...";
     }
 }
