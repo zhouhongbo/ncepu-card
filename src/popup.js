@@ -57,7 +57,7 @@ document.querySelector("button").onclick = function () {
     }, 10);
 }
 
-// 关于
+// 关于按键
 document.querySelector("#about").onclick = function () {
     document.querySelector("#right").innerHTML = `<p class='center'>Buy me a coffee if it helps.</p>
     <img src='../img/wechat.png' width='200px' height='200px'>
