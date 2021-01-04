@@ -27,36 +27,44 @@ endMonthSelector.options[date.getMonth()].selected = 1;
 
 // 按钮点击事件
 document.querySelector("button").onclick = function () {
-    document.querySelector("#warn").innerHTML = " ";
-    let startYear = +startYearSelector[startYearSelector.selectedIndex].text;
-    let endYear = +endYearSelector[endYearSelector.selectedIndex].text;
-    let startMonth = +startMonthSelector[startMonthSelector.selectedIndex].text;
-    let endMonth = +endMonthSelector[endMonthSelector.selectedIndex].text;
+    document.querySelector("#warn").innerHTML = "";
+    document.querySelector("#page").innerText = "";
+    document.querySelector("#month").innerText = "检查日期和登录状态......";
+    setTimeout(() => {
+        let startYear = +startYearSelector[startYearSelector.selectedIndex].text;
+        let endYear = +endYearSelector[endYearSelector.selectedIndex].text;
+        let startMonth = +startMonthSelector[startMonthSelector.selectedIndex].text;
+        let endMonth = +endMonthSelector[endMonthSelector.selectedIndex].text;
 
-    // 检查时间是否合法
-    let startDate = new Date(startYear, startMonth - 1);
-    let endDate = new Date(endYear, endMonth - 1);
-    debugger
-    if (endDate - startDate < 0 || date - startDate < 0 || date - endDate < 0) {
-        document.querySelector("#warn").innerHTML = "时间输入错误，请重新选择！";
-    } else if (!isLogin()) {
-        document.querySelector("#warn").innerHTML = "未登陆！";
-    } else {
-        let message = {
-            startYear: startYear,
-            startMonth: startMonth,
-            endYear: endYear,
-            endMonth: endMonth
-        };
-        chrome.runtime.sendMessage(message);
-    }
+        // 检查时间是否合法
+        let startDate = new Date(startYear, startMonth - 1);
+        let endDate = new Date(endYear, endMonth - 1);
+        debugger
+        if (endDate - startDate < 0 || date - startDate < 0 || date - endDate < 0) {
+            document.querySelector("#warn").innerHTML = "时间输入错误，请重新选择！";
+        } else if (!isLogin()) {
+            document.querySelector("#warn").innerHTML = "未登陆！";
+        } else {
+            document.querySelector("#month").innerText = "正在下载......";
+            let message = {
+                startYear: startYear,
+                startMonth: startMonth,
+                endYear: endYear,
+                endMonth: endMonth
+            };
+            chrome.runtime.sendMessage(message);
+        }
+    }, 10);
 }
 
 chrome.runtime.onMessage.addListener((message) => {
-    if (message === "未登陆！") {
-        document.querySelector("#warn").innerHTML = message;
+    if (message === "下载完成！") {
+        document.querySelector("#page").innerText = message;
+        document.querySelector("#month").innerText = "";
+    } else if (message.length < 8) {
+        document.querySelector("#page").innerText = message;
     } else {
-        document.querySelector("#progress").innerHTML = document.querySelector("#progress").innerHTML + message + "<br>";
+        document.querySelector("#month").innerText = message;
         console.log(message);
     }
 })
