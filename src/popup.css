@@ -27,6 +27,16 @@ body {
     padding-bottom: 9px;
 }
 
+#right a {
+    padding-left: 10px;
+    text-decoration: none;
+}
+
 #warn {
     color: red;
+}
+
+.center {
+    text-align: center;
+    font-size: 15px;
 }

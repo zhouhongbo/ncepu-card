@@ -57,6 +57,19 @@ document.querySelector("button").onclick = function () {
     }, 10);
 }
 
+// 关于
+document.querySelector("#about").onclick = function () {
+    document.querySelector("#right").innerHTML = `<p class='center'>Buy me a coffee if it helps.</p>
+    <img src='../img/wechat.png' width='200px' height='200px'>
+    <p class='center'>微信赞赏码</p>`;
+    document.querySelector("#left").innerHTML = `<p>目前只在我的校园卡上测试通过，可能会存在意料之外的bug</p>
+    <br>
+    <p>改进意见和bug反馈欢迎发送至邮件</p>
+    <br>
+    <p>zhouhongbode@gmail.com</p>
+    `;
+}
+
 chrome.runtime.onMessage.addListener((message) => {
     if (message === "下载完成！") {
         document.querySelector("#page").innerText = message;
