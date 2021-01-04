@@ -86,9 +86,15 @@ function onePage(endDate, records, currentPage, pageNum) {
 
     // 把数据保存进records
     let response = getResponse(startTime, endTime, currentPage);
-    responseToRecord(response, records);
-    console.log(currentPage + "/" + pageNum);
-    chrome.runtime.sendMessage(currentPage + "/" + pageNum);
+    let recordNum = response.match(/共(.+)条/)[1];
+    if (recordNum === "0") {
+        console.log(`${endDate.getFullYear()}年${endDate.getMonth()+1}月无消费记录`);
+        chrome.runtime.sendMessage(`${endDate.getFullYear()}年${endDate.getMonth()}月无消费记录`);
+    } else {
+        responseToRecord(response, records);
+        console.log(currentPage + "/" + pageNum);
+        chrome.runtime.sendMessage(currentPage + "/" + pageNum);
+    }
 }
 
 function recordsToExcel(records, filename) {
