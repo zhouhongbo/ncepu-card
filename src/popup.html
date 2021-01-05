@@ -1,40 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
-    <div>
-        <span>开始时间：</span>
-        <select id="startYear"></select>
-        <span>年</span>
-        <select id="startMonth"></select>
-        <span>月</span>
+    <div id="left">
+        <div>
+            <p><strong>校园卡账单下载插件</strong></p>
+            <br>
+            <span>开始时间：</span>
+            <select id="startYear"></select>
+            <span>年</span>
+            <select id="startMonth"></select>
+            <span>月</span>
+        </div>
+
+        <br>
+
+        <div>
+            <span>结束时间：</span>
+            <select id="endYear"></select>
+            <span>年</span>
+            <select id="endMonth"></select>
+            <span>月</span>
+        </div>
+
+        <br>
+
+        <div>
+            <button>下载</button>
+            <span id="warn"> </span>
+        </div>
+
+        <br>
+
+        <div>
+            <span id="month"></span>
+            <span id="page"></span>
+        </div>
     </div>
 
-    <br>
-    
-    <div>
-        <span>结束时间：</span>
-        <select id="endYear"></select>
-        <span>年</span>
-        <select id="endMonth"></select>
-        <span>月</span>
+    <div id="right">
+        <p>
+            <strong>使用说明</strong>
+            <a href="#" id="about">关于</a>
+            
+        </p>
+        <p>请先在浏览器中登陆校园一卡通网站 ecard.ncepu.edu.cn</p>
+        <p>若不记得密码，可以先登陆数字华电 my.ncepu.edu.cn，在“待办提醒”栏选择“校园卡”，可以曲线登陆校园一卡通网站</p>
+        <p>若中途退出窗口，不要担心，程序仍在后台运行，只是看不到下载进度</p>
+        
     </div>
 
-    <br>
-    
-    <button>读取消费记录</button>
-    <span id="warn"> </span>
-
-    <br>
-
-    <p id="progress"></p>
-    
     <script src="xlsx.full.min.js"></script>
     <script src="popup.js"></script>
 </body>
+
 </html>

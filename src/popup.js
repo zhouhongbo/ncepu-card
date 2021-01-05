@@ -27,103 +27,72 @@ endMonthSelector.options[date.getMonth()].selected = 1;
 
 // 按钮点击事件
 document.querySelector("button").onclick = function () {
-    document.querySelector("#warn").innerHTML = " ";
-    let startYear = +startYearSelector[startYearSelector.selectedIndex].text;
-    let endYear = +endYearSelector[endYearSelector.selectedIndex].text;
-    let startMonth = +startMonthSelector[startMonthSelector.selectedIndex].text;
-    let endMonth = +endMonthSelector[endMonthSelector.selectedIndex].text;
+    document.querySelector("#warn").innerHTML = "";
+    document.querySelector("#page").innerText = "";
+    document.querySelector("#month").innerText = "检查日期和登录状态......";
+    setTimeout(() => {
+        let startYear = +startYearSelector[startYearSelector.selectedIndex].text;
+        let endYear = +endYearSelector[endYearSelector.selectedIndex].text;
+        let startMonth = +startMonthSelector[startMonthSelector.selectedIndex].text;
+        let endMonth = +endMonthSelector[endMonthSelector.selectedIndex].text;
 
-    // 检查时间是否合法
-    let startDate = new Date(startYear, startMonth - 1);
-    let endDate = new Date(endYear, endMonth - 1);
-    if (endDate - startDate < 0 || date - startDate < 0 || date - endDate < 0) {
-        document.querySelector("#warn").innerHTML = "时间输入错误，请重新选择";
-    } else {
-        // 逆向遍历月份，把所有数据保存到records
-        let records = [["消费地点", "设备ID", "消费时间", "消费金额", "卡内余额"]];
-        function loop(startDate, endDate, records) {
-            if (endDate - startDate < 0) {
-                recordsToExcel(records, startDate, endDate);
-                return;
-            } else {
-                console.log(`正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据...`);
-                oneMonth(endDate.getFullYear(), endDate.getMonth() + 1, records);
-                endDate.setMonth(endDate.getMonth() - 1);
-                setTimeout(loop, 0, startDate, endDate, records);
-                document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`;
-            }
+        // 检查时间是否合法
+        let startDate = new Date(startYear, startMonth - 1);
+        let endDate = new Date(endYear, endMonth - 1);
+        debugger
+        if (endDate - startDate < 0 || date - startDate < 0 || date - endDate < 0) {
+            document.querySelector("#warn").innerHTML = "时间输入错误，请重新选择！";
+        } else if (!isLogin()) {
+            document.querySelector("#warn").innerHTML = "未登陆！";
+        } else {
+            document.querySelector("#month").innerText = "正在下载......";
+            let message = {
+                startYear: startYear,
+                startMonth: startMonth,
+                endYear: endYear,
+                endMonth: endMonth
+            };
+            chrome.runtime.sendMessage(message);
         }
-        setTimeout(loop, 0, startDate, endDate, records);
-        document.querySelector("#progress").innerText = `正在读取${endDate.getFullYear()}年${endDate.getMonth() + 1}月的数据......`;
-    }
+    }, 10);
 }
 
+// 关于按键
+document.querySelector("#about").onclick = function () {
+    document.querySelector("#right").innerHTML = `<p class='center'>Buy me a coffee if it helps.</p>
+    <img src='../img/wechat.png' width='200px' height='200px'>
+    <p class='center'>微信赞赏码</p>`;
+    document.querySelector("#left").innerHTML = `<p>目前只在我的校园卡上测试通过，可能会存在意料之外的bug</p>
+    <br>
+    <p>改进意见和bug反馈欢迎发送至邮件</p>
+    <br>
+    <p>zhouhongbode@gmail.com</p>
+    `;
+}
 
-function getResponse(startTime, endTime, pageId) {
-    // 时间格式 2020-12-01
-    let url = `http://ecard.ncepu.edu.cn/cardUserManager.do?method=searchTrjnInfo&page=${pageId}&startTime=${startTime}&endTime=${endTime}&findType=1210&goPage=`;
+chrome.runtime.onMessage.addListener((message) => {
+    if (message === "下载完成！") {
+        document.querySelector("#page").innerText = message;
+        document.querySelector("#month").innerText = "";
+    } else if (message.length < 8) {
+        document.querySelector("#page").innerText = message;
+    } else {
+        document.querySelector("#month").innerText = message;
+        console.log(message);
+    }
+})
+
+function isLogin() {
+    let url = "http://ecard.ncepu.edu.cn/cardUserManager.do?method=searchTrjnInfo&page=1&startTime=2020-01-01&endTime=2020-01-01&findType=1210&goPage=";
     let xhr = new XMLHttpRequest();
     xhr.open("GET", url, false);
     xhr.send();
     if (xhr.status === 200) {
-        return xhr.response;
-    }
-}
-
-function responseToRecord(response, records) {
-    let recordElements = response.match(/"center">(.+)</g).map((val) => {
-        val = val.replace("<", "");
-        val = val.replace('"center">', "");
-        return val;
-    });
-
-    for (let i = 0; i < recordElements.length / 5; i++) {
-        let record = [recordElements[i * 5], recordElements[i * 5 + 1], recordElements[i * 5 + 2], recordElements[i * 5 + 3], recordElements[i * 5 + 4]];
-        records.push(record);
-    }
-}
-
-function oneMonth(year, month, records) {
-    // 获得当前月的最后一天
-    let date = new Date(year, month - 1);
-    date.setMonth(date.getMonth() + 1);
-    date.setDate(date.getDate() - 1);
-    let lastDay = date.getDate();
-
-    // 设置起始时间
-    let startTime = "";
-    let endTime = "";
-    if (month < 10) {
-        startTime = year + "-0" + month + "-01";
-        endTime = year + "-0" + month + "-" + lastDay;
-    } else {
-        startTime = year + "-" + month + "-01";
-        endTime = year + "-" + month + "-" + lastDay;
-    }
-
-    // 把数据保存进records
-    let response = getResponse(startTime, endTime, "1");
-    let pageNum = response.match(/第1\/(.+)页/)[1];
-    let recordNum = response.match(/共(.+)条/)[1];
-    if (recordNum === "0") {
-        console.log(`${year}年${month}月无消费记录`);
-    } else {
-        for (let i = 1; i <= parseInt(pageNum); i++) {
-            let response = getResponse(startTime, endTime, i);
-            responseToRecord(response, records);
-            console.log(i + "/" + pageNum);
+        debugger
+        if (xhr.response.match(/共(.+)条/)[1] === "-1") {
+            return false;
+        } else {
+            return true;
         }
     }
-}
-
-function recordsToExcel(records, startDate, endDate) {
-    let filename = `${startDate.getFullYear()}年${startDate.getMonth() + 1}月至${endDate.getFullYear()}年${endDate.getMonth() + 1}月校园卡消费记录.xlsx`;
-    let data = records;  // 数据，一定注意需要是二维数组
-    let ws_name = "Sheet1"; // Excel第一个sheet的名称
-    let wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = [{ wch: 20 }, { wch: 8 }, { wch: 20 }, { wch: 8 }, { wch: 8 }] // 设置列宽
-    XLSX.utils.book_append_sheet(wb, ws, ws_name);  // 将数据添加到工作薄
-    XLSX.writeFile(wb, filename); // 导出Excel
-    console.log("导出成功！")
-    document.querySelector("#progress").innerText = "导出成功！";
 }
